@@ -1,0 +1,7 @@
+#include "funciones.c"
+
+double dimecos(double valor)
+{
+  return cos(valor);
+}
+

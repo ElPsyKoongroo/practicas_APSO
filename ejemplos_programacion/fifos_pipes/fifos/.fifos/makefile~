@@ -1,0 +1,4 @@
+all: a
+
+a: a.c
+	cc a.c -o a

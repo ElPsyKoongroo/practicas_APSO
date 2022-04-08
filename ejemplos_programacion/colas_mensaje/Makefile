@@ -1,0 +1,8 @@
+all: cola1 cola2
+
+cola1: cola1.c
+	cc cola1.c -o cola1
+
+cola2: cola2.c
+	cc cola2.c -o cola2
+

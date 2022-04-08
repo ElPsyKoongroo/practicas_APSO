@@ -1,0 +1,8 @@
+#include <stdio.h>
+
+main()
+{
+ printf("Hola mundo\n");
+ printf("El coseno de 10 vale %f\n",dimecos(10));
+}
+
