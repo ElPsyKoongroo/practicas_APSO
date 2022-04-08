@@ -1,4 +1,4 @@
-all: conhilos
+all: main
 
-conhilos: conhilos.c
-	gcc conhilos.c -o conhilos -pthread
+main: practica2.c
+	gcc practica2.c -o main -pthread
