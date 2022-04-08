@@ -18,7 +18,7 @@ int main()
     printf("Introduzca un numero inicial:\n");
     scanf("%d", &numero);
 
-    printf("Cualquier contador a partir de ahora sera usador para sumarlo");
+    printf("Cualquier numero a partir de ahora sera usado para sumarlo\n");
 
     pthread_create(&h1, NULL, (void*)read, (void*)&sumador);
 
