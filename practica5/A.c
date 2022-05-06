@@ -21,7 +21,7 @@ int main(void) {
     vpidb = fork();
     if (vpidb == 0) {
         dup2(pipas_reyes[0], 4);
-        execl("B", "B", NULL);
+        execl("B.o", "B.o", NULL);
         perror("no se puede ejecutar B: ");
         exit(-1);
     } else if (vpidb == -1) {
@@ -30,7 +30,7 @@ int main(void) {
 
     vpidc = fork();
     if (vpidc == 0) {
-        execl("C", "C", NULL);
+        execl("C.o", "C.o", NULL);
         perror("no se puede ejecutar B: ");
         exit(-1);
     } else if (vpidb == -1) {
@@ -46,5 +46,6 @@ int main(void) {
     wait(&retorno);
     fprintf(stdout, "El ultimo mensaje\n");
     close(pipas_reyes[1]);
+    unlink("fifito");
     return 0;
 }
