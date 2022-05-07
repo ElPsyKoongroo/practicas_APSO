@@ -1,27 +1,24 @@
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-int main()
-{
+int main() {
+    int proc;
     printf("Se acaba de iniciar el proceso A con PID %d\n", getpid());
-
-    int proc = fork();
-
-    if(!proc)
-    {
-        printf("Se acaba de iniciar el proceso B con PID %d\n, y el padre A: %d", getpid(), getppid());
-        exit(0);
-    }
-    printf("Creado B con PID %d\n", proc);
 
     proc = fork();
 
-    if(!proc)
-    {
+    if (!proc) {
+        printf("Se acaba de iniciar el proceso B con PID %d, y el padre A: %d\n",getpid(), getppid());
+        exit(0);
+    }
+
+    proc = fork();
+
+    if (!proc) {
         close(1);
         open("infoc", O_WRONLY | O_CREAT, 0666);
 
