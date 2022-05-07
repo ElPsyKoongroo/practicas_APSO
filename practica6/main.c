@@ -3,22 +3,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/msg.h>
+#include <fcntl.h>
 #include <time.h>
 #include <unistd.h>
 
 struct Numero {
-    long Id_Men; // 1 -> Positivo, 2 -> Negativo
-    int Numero;
+    long type; // 1 -> Positivo, 2 -> Negativo
+    int value;
 };
 
 void ProcesoA(int Clave) {
-    int Id_Cola;
-    int num_aletatorio;
+    int id_cola, num_aletatorio, bytes_sent;
 
-    Id_Cola = msgget(Clave, 0600 | IPC_CREAT);
-
-    if (Id_Cola == 0) {
-        printf("Error al abrir la cola en A");
+    id_cola = msgget(Clave, S_IWUSR | S_IRUSR | IPC_CREAT);
+    
+    if (id_cola == -1) {
+        perror("Error al abrir la cola: ");
     }
 
     struct Numero numero;
@@ -29,65 +29,74 @@ void ProcesoA(int Clave) {
     while (contador != 10) {
         sleep_time = rand() % 2 + 1;
 
-        sleep(sleep_time);
 
         num_aletatorio = (rand() % 201) - 100;
 
-        numero.Id_Men = (num_aletatorio < 0 ? 2 : 1);
-        numero.Numero = num_aletatorio;
+        numero.type = (num_aletatorio < 0 ? 2 : 1);
+        numero.value = num_aletatorio;
 
-        msgsnd(Id_Cola, (struct msgbuf *)&numero, sizeof(numero) - sizeof(long),
-               0);
-        contador++;
+
+        
+        bytes_sent = msgsnd(id_cola, (void *)&numero, sizeof(numero.value), 0);
+        if(bytes_sent) perror("Error al escribir: ");
+        ++contador;
+        sleep(sleep_time);
     }
-    msgctl(Id_Cola, IPC_RMID, (struct msqid_ds *)NULL);
+    msgctl(id_cola, IPC_RMID, (struct msqid_ds *)NULL);
 }
 
 void ProcesoB(int Clave) {
-    int Id_Cola;
-
-    Id_Cola = msgget(Clave, 0600 | IPC_CREAT);
-
-    if (Id_Cola == 0) {
-        printf("Error al abrir la cola en B");
+    int id_cola, bytes_read;
+    struct Numero numero;
+    long msgtyp = 1;
+    sleep(1);
+    id_cola = msgget(Clave, S_IRUSR | IPC_CREAT);
+    
+    if (id_cola == 0) {
+        printf("Error al abrir la cola en B\n");
     }
 
-    struct Numero numero;
-    int leido;
-
     do {
-
-    } while (leido != 0);
+        bytes_read = msgrcv(id_cola, (void *)&numero, sizeof(numero) - sizeof(long), msgtyp, 0);
+        fprintf(stdout, "Numerito desde B: %d, bytes leidos: %d \n", numero.value, bytes_read);
+    } while (bytes_read != -1);
 }
 
 void ProcesoC(int Clave) {
-    int Id_Cola;
-
-    Id_Cola = msgget(Clave, 0600 | IPC_CREAT);
-
-    if (Id_Cola == 0) {
-        printf("Error al abrir la cola en C");
+    int id_cola, bytes_read;
+    long msgtyp = 2;
+    sleep(1);
+    id_cola = msgget(Clave, S_IRUSR | IPC_CREAT);
+    
+    if (id_cola == 0) {
+        printf("Error al abrir la cola en C\n");
     }
 
     struct Numero numero;
+
+    do {
+        bytes_read = msgrcv(id_cola, (void *)&numero, sizeof(numero) - sizeof(long), msgtyp, 0);
+        fprintf(stdout, "Numerito desde C: %d, bytes_leidos: %d\n", numero.value, bytes_read);
+    } while (bytes_read != -1);
 }
 
 int main() {
     int forks;
 
     key_t Clave;
-    int Id_Cola;
+    int id_cola;
 
-    Clave = ftok("Makefile", 14);
+    Clave = ftok("./Makefile", 14);
     if (Clave == (key_t)-1) {
         printf("Error al crear la clave");
         exit(-1);
     }
 
-    Id_Cola = msgget(Clave, 0600); // Asegurarse que la cola no está ya creada
+    id_cola = msgget(Clave, S_IRUSR | S_IWUSR); // Asegurarse que la cola no está ya creada
 
-    if (Id_Cola != -1) {
-        msgctl(Id_Cola, IPC_RMID, (struct msqid_ds *)NULL);
+    if (id_cola != -1) {
+        fprintf(stderr, "Borrando la cola anterior\n");
+        msgctl(id_cola, IPC_RMID, (struct msqid_ds *)NULL);
     }
 
     forks = fork();
