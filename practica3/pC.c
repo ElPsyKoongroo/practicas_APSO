@@ -5,13 +5,11 @@
 
 int main(int argc, char *argv[]) {
     int parent = getppid();
-
-    if (parent) {
+    int arg_parent = atoi(argv[1]);
+    if (argc < 2 || arg_parent != parent) {
         printf("Se acaba de iniciar el proceso C con PID %d\n", getpid());
-    } else {
-        FILE *infoc = fopen("infoc", "w");
-        fprintf(infoc, "Se acaba de iniciar el proceso C con PID %d\n, y el padre A: %d",getpid(), parent);
-        fclose(infoc);
+    } else {  
+        printf("Se acaba de iniciar el proceso C con PID %d, y el padre A: %d\n",getpid(), arg_parent);
     }
     return 0;
 }
