@@ -31,22 +31,13 @@ int main(){
 
     pipe(tub1);
     fifo_err = mkfifo("f1", 0777);
+    perror("Error al generar la fifo: ");
     if(fifo_err != 0){
         unlink("f1");
         printf("Unlinking f1\n");
-        sleep(1);
+        sleep(3);
         mkfifo("f1", 0777);
     }
-
-    // TODO, NO ESCRIBE
-    fifo_id = open("f1", O_WRONLY);
-    if (fifo_id == -1){
-        perror("Error al abrir fifito: ");
-        exit(-1);
-    }
-    puts("Todo ok");
-    write(fifo_id, &pr51, sizeof(pr51));
-    
 
     pr52 = fork();
     if(pr52 == 0){
@@ -68,11 +59,19 @@ int main(){
         exit(-1);
     }
     
+    sleep(1);
+    fifo_id = open("./f1", O_WRONLY);
+    if(fifo_id == -1){
+        perror("Error al abrir la fifo: ");
+        exit(-1);
+    }
+    write(fifo_id, &pr51, sizeof(pr51));
 
     pause();
+    
     printf("pr51 con pid %d. Mensaje 5\n", pr51);
 
-    unlink("f1");
+    unlink("f2");
     close(fifo_id);
     close(tub1[0]);
     close(tub1[1]);
