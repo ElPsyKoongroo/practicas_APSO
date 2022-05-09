@@ -59,6 +59,6 @@ int main(){
             msgtype = i%2 + 1;   
             i++;
         }
-    }while(i<=20);
+    }while(i<20);
     msgctl(id_cola, IPC_RMID, (struct msqid_ds *)NULL);
 }

@@ -16,7 +16,7 @@ struct Msg {
     int value; 
 };
 
-int main(int argc, char* argv[]){
+int main(void){
     srand(time(NULL));
     int counter = 0, sleep_time = rand()%(16-8)+8, id_cola;
     key_t Clave;
@@ -26,10 +26,9 @@ int main(int argc, char* argv[]){
     Clave = ftok("./Makefile", 33);
     id_cola = msgget(Clave, S_IWUSR | IPC_CREAT);
 
-    int bytes_sent;
     while (counter < 10){
         caracter.value = (rand()%(123-65))+65;
-        bytes_sent = msgsnd(id_cola, (void*)&caracter, sizeof(caracter.value), 0);
+        msgsnd(id_cola, (void*)&caracter, sizeof(caracter.value), 0);
         sleep(sleep_time);
         sleep_time = rand()%(16-8)+8;
         ++counter;
