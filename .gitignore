@@ -27,6 +27,7 @@
 *.so
 *.so.*
 *.dylib
+*.dat
 
 # Executables
 *.exe
@@ -43,7 +44,9 @@
 *.pdb
 
 # Kernel Module Compile Results
+*.pdf
 *.mod*
+*.json
 *.cmd
 .tmp_versions/
 modules.order
