@@ -46,6 +46,8 @@
 # Kernel Module Compile Results
 *.pdf
 *.mod*
+*.bin
+*.txt
 *.json
 *.cmd
 .tmp_versions/
