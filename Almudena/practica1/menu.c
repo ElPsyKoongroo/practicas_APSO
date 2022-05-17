@@ -37,7 +37,7 @@ void caso2(){
 
 
     char dato = 'a';
-    int file_desc = open(nombre_fichero, S_IRUSR);
+    int file_desc = open(nombre_fichero, O_RDONLY);
     int bytes_read = 1;
 
 
@@ -68,7 +68,7 @@ void caso4(){
     printf("Introduce el nombre del fichero: ");
     cin(nombre_fichero, sizeof(char)*50);
 
-    int file_desc = open(nombre_fichero, S_IWUSR | O_CREAT);
+    int file_desc = open(nombre_fichero, O_WRONLY | O_CREAT);
 
     if(file_desc == -1){
         printf("No se ha podido abrir el archivo\n");
