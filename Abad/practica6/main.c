@@ -1,9 +1,9 @@
 #include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/msg.h>
-#include <fcntl.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -16,7 +16,7 @@ void ProcesoA(int Clave) {
     int id_cola, num_aletatorio, bytes_sent;
 
     id_cola = msgget(Clave, S_IWUSR | S_IRUSR | IPC_CREAT);
-    
+
     if (id_cola == -1) {
         perror("Error al abrir la cola: ");
     }
@@ -29,16 +29,15 @@ void ProcesoA(int Clave) {
     while (contador != 10) {
         sleep_time = rand() % 2 + 1;
 
-
         num_aletatorio = (rand() % 201) - 100;
 
         numero.type = (num_aletatorio < 0 ? 2 : 1);
         numero.value = num_aletatorio;
 
-
-        
-        bytes_sent = msgsnd(id_cola, (void *)&numero, sizeof(numero.value), 0);
-        if(bytes_sent) perror("Error al escribir: ");
+        bytes_sent =
+            msgsnd(id_cola, (struct msgbuf *)&numero, sizeof(numero.value), 0);
+        if (bytes_sent)
+            perror("Error al escribir: ");
         ++contador;
         sleep(sleep_time);
     }
@@ -51,14 +50,16 @@ void ProcesoB(int Clave) {
     long msgtyp = 1;
     sleep(1);
     id_cola = msgget(Clave, S_IRUSR | IPC_CREAT);
-    
+
     if (id_cola == 0) {
         printf("Error al abrir la cola en B\n");
     }
 
     do {
-        bytes_read = msgrcv(id_cola, (void *)&numero, sizeof(numero) - sizeof(long), msgtyp, 0);
-        fprintf(stdout, "Numerito desde B: %d, bytes leidos: %d \n", numero.value, bytes_read);
+        bytes_read = msgrcv(id_cola, (void *)&numero,
+                            sizeof(numero) - sizeof(long), msgtyp, 0);
+        fprintf(stdout, "Numerito desde B: %d, bytes leidos: %d \n",
+                numero.value, bytes_read);
     } while (bytes_read != -1);
 }
 
@@ -67,7 +68,7 @@ void ProcesoC(int Clave) {
     long msgtyp = 2;
     sleep(1);
     id_cola = msgget(Clave, S_IRUSR | IPC_CREAT);
-    
+
     if (id_cola == 0) {
         printf("Error al abrir la cola en C\n");
     }
@@ -75,8 +76,10 @@ void ProcesoC(int Clave) {
     struct Numero numero;
 
     do {
-        bytes_read = msgrcv(id_cola, (void *)&numero, sizeof(numero) - sizeof(long), msgtyp, 0);
-        fprintf(stdout, "Numerito desde C: %d, bytes_leidos: %d\n", numero.value, bytes_read);
+        bytes_read = msgrcv(id_cola, (void *)&numero,
+                            sizeof(numero) - sizeof(long), msgtyp, 0);
+        fprintf(stdout, "Numerito desde C: %d, bytes_leidos: %d\n",
+                numero.value, bytes_read);
     } while (bytes_read != -1);
 }
 
@@ -92,7 +95,8 @@ int main() {
         exit(-1);
     }
 
-    id_cola = msgget(Clave, S_IRUSR | S_IWUSR); // Asegurarse que la cola no está ya creada
+    id_cola = msgget(
+        Clave, S_IRUSR | S_IWUSR); // Asegurarse que la cola no está ya creada
 
     if (id_cola != -1) {
         fprintf(stderr, "Borrando la cola anterior\n");
